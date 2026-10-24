@@ -1,0 +1,38 @@
+name: Build Railway Card EXE
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Rename HTML to index.html
+      run: |
+        copy "RAILWAY_ID_CARD_GENARETOR_v1.3.html" "index.html"
+
+    - name: Install PyInstaller
+      run: |
+        python -m pip install --upgrade pip
+        pip install pyinstaller
+
+    - name: Build Standalone EXE
+      run: |
+        pyinstaller --noconfirm --onefile --windowed --add-data "index.html;." app_launcher.py -n "Railway_ID_Card"
+
+    - name: Upload EXE Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: Railway_ID_Card_EXE
+        path: dist/Railway_ID_Card.exe
